@@ -31,7 +31,7 @@ grid on;
 
 Ka = 0.8 % amplitude sensitivity
 
-Z = (1+Ka.*Ym).*Yc;
+Z = (Ac+Ym).*Yc;
 
 subplot(3,1,3);
 title('Amlitude Modulated Signal');

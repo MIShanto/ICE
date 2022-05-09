@@ -22,7 +22,7 @@ title('Message Signal');
 plot(time,Ym);
 grid on;
 
-Yc = Ac*sin(2*pi*Fc*time + cos(2*pi*Fm*time));
+Yc = Ac*sin(2*pi*Fc*time);
 
 subplot(3,1,2);
 title('Carrier Signal');
