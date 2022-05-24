@@ -58,3 +58,21 @@ plot(t, ask);
 xlim([0, T]);
 ylim([-5, 5]);
 grid on;
+
+%Demodulation
+counter = 0;
+
+data = zeros(1, int8(length(t)/fs*bit_duration));
+for i=1:length(t)
+    if t(i) > counter*bit_duration
+        counter = counter + 1;
+        if ask(i) == 0
+            data(counter) = 0;
+        else
+            data(counter) = 1;
+        end
+    end
+end
+
+disp(data)
+        

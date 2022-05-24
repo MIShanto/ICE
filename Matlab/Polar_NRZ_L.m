@@ -11,7 +11,7 @@ v_0 = -5;
 v_1 = 5;
 
 fs = 100;
-bit_duration = 2; % bitrate = 1/bitduration
+bit_duration = 3; % bitrate = 1/bitduration
 T = length(bit) * bit_duration; % len/bitrate.
 t = 0:1/fs:T;
 
@@ -26,13 +26,13 @@ for i = 1:length(bit)
     end
 end
 
-subplot(1,2,1);
 plot(t, x_digital);
 xlim([0, T]);
 ylim([-10, 10]);
 grid on;
 
 %decoding
+%method 1
 data = zeros(1, length(bit));
 
 for i=1:length(bit)
@@ -40,6 +40,23 @@ for i=1:length(bit)
         data(i) = 1;
     else
         data(i) = 0;
+    end
+end
+
+disp(data)
+
+%method 2
+data = zeros(1, length(bit));
+counter = 0;
+
+for i=1:length(t)
+    if t(i) > counter*bit_duration 
+        counter = counter + 1;
+        if(x_digital(i) > 0)
+            data(counter) = 1;
+        else
+            data(counter) = 0;
+        end
     end
 end
 

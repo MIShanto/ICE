@@ -1,5 +1,5 @@
 %Digital signal....
-%ASK 1 = has signal else no;
+%PSK 1 = has one phase else another;
 
 clear all;
 clc;
@@ -48,22 +48,41 @@ xlim([0, T]);
 ylim([-5, 5]);
 grid on;
 
-%FSK
-fsk = zeros(1, length(t));
+%PSK
+psk = zeros(1, length(t));
 
 for i = 1:length(bit)
     from = (i-1)*fs*bit_duration+1;
     to = i*fs*bit_duration;
     
     if bit(i) == 1
-        fsk(from:to) = x_analog(from:to);
+        psk(from:to) = x_analog(from:to);
+        p1 = round(trapz(psk(from:to)));
     else
-        fsk(from:to) = x_analog_2(from:to);
+        psk(from:to) = x_analog_2(from:to);
+        p2 = round(trapz(psk(from:to)));
     end
 end
 
 subplot(4,1, 4);
-plot(t, fsk);
+plot(t, psk);
 xlim([0, T]);
 ylim([-5, 5]);
 grid on;
+
+%Demodulation
+
+data = zeros(1, int8(length(t)/fs*bit_duration));
+
+for i = 1:length(t)/fs*bit_duration
+    from = (i-1)*fs*bit_duration+1;
+    to = i*fs*bit_duration;
+    
+    if round(trapz(psk(from:to))) == p1
+        data(i) = 1;
+    elseif round(trapz(psk(from:to))) == p2
+        data(i) = 0;
+    end
+end
+
+disp(data)

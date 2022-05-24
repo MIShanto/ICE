@@ -1,5 +1,5 @@
 %Digital signal....
-%ASK 1 = has signal else no;
+%FSK 1 = has one frequency else another;
 
 clear all;
 clc;
@@ -58,8 +58,10 @@ for i = 1:length(bit)
     
     if bit(i) == 1
         fsk(from:to) = x_analog(from:to);
+        f1 = round(trapz(fsk(from:to)));
     else
         fsk(from:to) = x_analog_2(from:to);
+        f2 = round(trapz(fsk(from:to)));
     end
 end
 
@@ -68,3 +70,20 @@ plot(t, fsk);
 xlim([0, T]);
 ylim([-5, 5]);
 grid on;
+
+%Demodulation
+
+data = zeros(1, int8(length(t)/fs*bit_duration));
+
+for i = 1:length(t)/fs*bit_duration
+    from = (i-1)*fs*bit_duration+1;
+    to = i*fs*bit_duration;
+    
+    if round(trapz(fsk(from:to))) == f1
+        data(i) = 1;
+    elseif round(trapz(fsk(from:to))) == f2
+        data(i) = 0;
+    end
+end
+
+disp(data)

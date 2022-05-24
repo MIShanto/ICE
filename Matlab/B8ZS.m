@@ -4,7 +4,7 @@
 
 clear all;
 clc;
-bit = [0 0 0 0 0 0 0  1 0];
+bit = [1 0 0 0 0 0 0 0  1 0];
 
 v = 2;
 
@@ -45,6 +45,7 @@ ylim([-10, 10]);
 grid on;
 
 %decoding
+%method 1
 data = zeros(1, length(bit));
 lastState = v;
 counter = 0;
@@ -69,5 +70,62 @@ while i <= length(bit)
     i = i + 1;
 end
 
+disp(data)
+
+%method 2
+
+data = zeros(1, length(bit));
+lastState = v;
+counter = 0;
+i=1;
+while i <= length(t)/ fs*bit_duration
+    from = (i-1)*fs*bit_duration+1;
+    to = i*fs*bit_duration;
+    if(x_digital(from : to) == -lastState)
+        data(i) = 1;
+        lastState = -lastState;
+    elseif(x_digital(from : to) == 0)
+        data(i) = 0;
+        counter = counter + 1;
+        if(counter > 3)
+            counter = 0;
+        end
+    elseif(x_digital(from : to) == lastState)
+        counter = 0;
+        data(i:i+4) = 0;
+        i = i + 4;
+    end
+    i = i + 1;
+end
+
+disp(data)
+
+%method 3
+
+data = zeros(1, length(bit));
+lastState = v;
+counter = 0;
+c = 0;
+i=1;
+while i <= length(t)
+    if t(i) > c*bit_duration
+        c = c + 1;
+        if(x_digital(i) == -lastState)
+            data(c) = 1;
+            lastState = -lastState;
+        elseif(x_digital(i) == 0)
+            data(c) = 0;
+            counter = counter + 1;
+            if(counter > 3)
+                counter = 0;
+            end
+        elseif(x_digital(i) == lastState)
+            counter = 0;
+            data(c:c+4) = 0;
+            c = c + 4;
+        end
+    end
+    i = i + 1;
+end
 
 disp(data)

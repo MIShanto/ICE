@@ -42,6 +42,7 @@ ylim([-10, 10]);
 grid on;
 
 %decoding
+%method 1
 data = zeros(1, length(bit));
 lastState = v;
 for i=1:length(bit)
@@ -56,6 +57,46 @@ for i=1:length(bit)
         data(i) = 0;
         
         
+    end
+end
+
+disp(data)
+
+%method 2
+data = zeros(1, length(bit));
+lastState = v;
+for i=1:length(t)/fs*bit_duration
+    from = (i-1)*fs*bit_duration+1;
+    to = i*fs*bit_duration;
+    mid = round((from+to)/2);
+    
+    if(x_digital(from : mid) == lastState)
+        data(i) = 1;
+        lastState = -lastState;
+    else
+        data(i) = 0;
+        
+        
+    end
+end
+
+disp(data)
+
+%method 3
+data = zeros(1, length(bit));
+lastState = v;
+counter = 0
+for i=1:length(t)
+    if t(i) > counter*bit_duration
+        counter = counter + 1
+        
+        if(x_digital(i) == lastState)
+            data(counter) = 1;
+            lastState = -lastState;
+        else
+            data(counter) = 0;
+
+        end
     end
 end
 

@@ -31,13 +31,13 @@ for i = 1:length(bit)
     end
 end
 
-subplot(1,2,1);
 plot(t, x_digital);
 xlim([0, T]);
 ylim([-10, 10]);
 grid on;
 
 %decoding
+%method 1
 data = zeros(1, length(bit));
 for i=1:length(bit)
     from = (i-1)*fs*bit_duration+1;
@@ -49,6 +49,38 @@ for i=1:length(bit)
     else
         data(i) = 0;
     end
+end
+
+disp(data)
+
+%method 2
+data = zeros(1, length(bit));
+for i=1:length(t)/fs*bit_duration
+    from = (i-1)*fs*bit_duration+1;
+    to = i*fs*bit_duration;
+    mid = round((from+to)/2);
+    
+    if(x_digital(from : mid) == v)
+        data(i) = 1;
+    else
+        data(i) = 0;
+    end
+end
+
+disp(data)
+
+%method 3
+data = zeros(1, length(bit));
+counter = 0;
+
+for i = 1:length(t)
+  if t(i)>counter*bit_duration
+    counter = counter + 1;
+    if x_digital(i)>0
+      data(counter) = x_digital(i)/v;
+    else data(counter) = 0;
+    end
+  end
 end
 
 disp(data)

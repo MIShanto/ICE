@@ -3,7 +3,7 @@
 
 clear all;
 clc;
-bit = [0 0 0 1 0 0 0 0 0 0 0 1];
+bit = [1 1 0 0 0 1 0 0 0 0 0 0 0 1];
 
 v = 2;
 
@@ -50,6 +50,7 @@ ylim([-10, 10]);
 grid on;
 
 %decoding
+%method 1
 data = zeros(1, length(bit));
 lastState = v;
 counter = 0;
@@ -59,24 +60,61 @@ non_zero_pulse = 0;
 while i <= length(bit)
     from = (i-1)*fs*bit_duration+1;
     to = i*fs*bit_duration;
-    if(x_digital(from : to) == -lastState) % either B or 1..
-        lastState = - lastState;
-        new_from = (i-1+3)*fs*bit_duration+1;
-        new_to = (i+3)*fs*bit_duration;
-        
-        if(new_from <= length(t) && new_to <= length(t))
-            if(x_digital(new_from : new_to) == lastState) %its V then it was B
-                data(i:i+3) = 0;
-                i = i + 3;
-            else
-                data(i) = 1;
-            end
-        else
-            data(i) = 1;
-        end
+    if(x_digital(from : to) == lastState) % either B or 1..
+        data(i-3:i) = 0;
+    elseif(x_digital(from : to) == 0)
+            data(i) = 0;
+    else
+        data(i) = 1;
+        lastState = -lastState;    
     end
     i = i + 1;
 end
 
+disp(data)
+
+%method 2
+data = zeros(1, length(bit));
+lastState = v;
+i=1;
+
+while i <= length(t)/fs*bit_duration
+    from = (i-1)*fs*bit_duration+1;
+    to = i*fs*bit_duration;
+    if(x_digital(from : to) == lastState) % either B or 1..
+        data(i-3:i) = 0;
+    elseif(x_digital(from : to) == 0)
+            data(i) = 0;
+    else
+        data(i) = 1;
+        lastState = -lastState;    
+    end
+    i = i + 1;
+end
 
 disp(data)
+
+%method 3
+data = zeros(1, length(bit));
+lastState = v;
+counter = 0;
+c = 0;
+i=1;
+non_zero_pulse = 0;
+
+for i = 1 : length(t)
+  if t(i) > c*bit_duration
+    c = c + 1;
+    if x_digital(i) == lastState
+      data(c-3:c) = 0;
+    else
+      if x_digital(i) == 0
+        data(c) = 0;
+      else
+        data(c) = 1;
+        lastState = -lastState;
+      end
+      end
+      end
+end
+disp(data);

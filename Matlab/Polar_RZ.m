@@ -38,6 +38,7 @@ ylim([-10, 10]);
 grid on;
 
 %decoding
+%method 1
 data = zeros(1, length(bit));
 for i=1:length(bit)
     from = (i-1)*fs*bit_duration+1;
@@ -48,6 +49,22 @@ for i=1:length(bit)
         data(i) = 1;
     else
         data(i) = 0;
+    end
+end
+
+disp(data)
+
+%method 2
+counter = 0;
+data = zeros(1, length(bit));
+for i=1:length(t)
+    if t(i) > counter*bit_duration
+        counter = counter + 1;
+        if(x_digital(i) == v)
+            data(counter) = 1;
+        else
+            data(counter) = 0;
+        end
     end
 end
 
